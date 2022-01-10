@@ -1,0 +1,70 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches: ["main", "master", "release-*"]
+  push:
+    branches: ["main", "master"]
+
+jobs:
+  e2e:
+    name: Run E2E Tests
+    strategy:
+      matrix:
+        go-version: ["1.17"]
+        platform: ["ubuntu-latest"]
+    runs-on: ${{ matrix.platform }}
+    env:
+      KO_DOCKER_REPO: kind.local
+      KIND_CLUSTER_NAME: e2e
+    timeout-minutes: 20
+
+    steps:
+    - name: Set up Go ${{ matrix.go-version }}
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+      id: go
+
+    - name: Setup ko
+      uses: imjasonh/setup-ko@v0.4 # will install latest ko version
+
+    - name: Check out Code onto GOPATH
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - name: Setup KinD Cluster
+      env:
+        KIND_VERSION: v0.11.1
+      run: |
+        set -x
+        curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-$(uname)-amd64
+        chmod +x ./kind
+        sudo mv kind /usr/local/bin
+
+        # KinD configuration.
+        cat > kind.yaml <<EOF
+        apiVersion: kind.x-k8s.io/v1alpha4
+        kind: Cluster
+        nodes:
+        - role: control-plane
+        - role: worker
+        EOF
+
+        # Create a cluster!
+        kind create cluster --config kind.yaml --wait 3m --name ${KIND_CLUSTER_NAME}
+
+    - name: Build ko images
+      run: ./test/upload_test_images.sh
+
+    - name: "Run E2E Tests"
+      env:
+        TESTFLAGS: "-v -tags=e2e -count 1 -race"
+      run: |
+        go test ${TESTFLAGS} ./test
+
+    - name: "Debug"
+      if: ${{ always() }}
+      run: |
+        kubectl get pods --all-namespaces
