@@ -87,6 +87,11 @@ func TestNewClient(t *testing.T) {
 
 			c, err := New(ctx)
 			assert.NilError(t, err)
+			assert.Assert(t, c.SOAP != nil)
+			assert.Assert(t, c.REST != nil)
+			assert.Assert(t, c.Tags != nil)
+			assert.Assert(t, c.Tasks != nil)
+			assert.Assert(t, c.Events != nil)
 
 			err = c.Logout()
 			assert.NilError(t, err)

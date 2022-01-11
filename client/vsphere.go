@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/event"
 	"github.com/vmware/govmomi/session"
 	"github.com/vmware/govmomi/session/keepalive"
 	"github.com/vmware/govmomi/task"
@@ -32,12 +33,14 @@ const (
 	passwordFileKey   = "password"
 )
 
-// Client is a combined vCenter SOAP and REST (VAPI) client
+// Client is a combined vCenter SOAP and REST (VAPI) client with fields to
+// directly access commonly used managers
 type Client struct {
-	SOAP  *govmomi.Client
-	REST  *rest.Client
-	Tags  *tags.Manager
-	Tasks *task.Manager
+	SOAP   *govmomi.Client
+	REST   *rest.Client
+	Tags   *tags.Manager
+	Tasks  *task.Manager
+	Events *event.Manager
 }
 
 // vSphere settings
@@ -62,7 +65,7 @@ func readKey(key string) (string, error) {
 }
 
 // New returns a combined vCenter SOAP and REST (VAPI) client with active
-// keep-alive configured via environment variables. Task and tag manager are
+// keep-alive configured via environment variables. Commonly used managers are
 // exposed for quick access.
 //
 // Use Logout() to release resources and perform a clean logout from vCenter.
@@ -77,14 +80,12 @@ func New(ctx context.Context) (*Client, error) {
 		return nil, fmt.Errorf("create vsphere REST client: %w", err)
 	}
 
-	tagm := tags.NewManager(rc)
-	taskm := task.NewManager(vclient.Client)
-
 	client := Client{
-		SOAP:  vclient,
-		REST:  rc,
-		Tags:  tagm,
-		Tasks: taskm,
+		SOAP:   vclient,
+		REST:   rc,
+		Tags:   tags.NewManager(rc),
+		Tasks:  task.NewManager(vclient.Client),
+		Events: event.NewManager(vclient.Client),
 	}
 
 	return &client, nil

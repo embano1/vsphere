@@ -18,7 +18,7 @@ Convenience libraries and helpers when interacting with the vSphere API. Uses
 
 `client` provides constructors for vSphere SOAP and REST APIs, and a generic
 `Client` which combines the different APIs and useful managers in a single
-component. 
+component. All clients are configured with session `keep-alive`.
 
 The `Client` can be created with `client.New(ctx)` and is configured via
 environment variables (see below) and plain text files for the `basic_auth` *username*
