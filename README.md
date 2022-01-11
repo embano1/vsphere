@@ -1,5 +1,5 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/embano1/vsphere.svg)](https://pkg.go.dev/github.com/embano1/vsphere)
-[![Tests](https://github.com/embano1/vsphere/actions/workflows/tests.yaml/badge.svg)](https://github.com/embano1/vsphere/actions/workflows/tests.yaml)
+[![Go Tests](https://github.com/embano1/vsphere/actions/workflows/go-tests.yaml/badge.svg)](https://github.com/embano1/vsphere/actions/workflows/go-tests.yaml)
 [![Latest Release](https://img.shields.io/github/release/embano1/vsphere.svg?logo=github&style=flat-square)](https://github.com/embano1/vsphere/releases/latest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/embano1/vsphere)](https://goreportcard.com/report/github.com/embano1/vsphere)
 [![codecov](https://codecov.io/gh/embano1/vsphere/branch/main/graph/badge.svg?token=TC7MW723JO)](https://codecov.io/gh/embano1/vsphere)
@@ -28,11 +28,11 @@ See [example](example/) and the package
 [documentation](https://pkg.go.dev/github.com/embano1/vsphere) for details.
 
 
-| Variable              | Description                                                                         | Required | Example                           | Default   |
-|-----------------------|-------------------------------------------------------------------------------------|----------|-----------------------------------|-----------|
-| `VCENTER_URL`         | vCenter Server URL                                                                  | yes      | `https://myvc-01.prod.corp.local` | `""`      |
-| `VCENTER_INSECURE`    | Ignore vCenter Server certificate warnings                                          | no       | `"true"`                          | `"false"` |
-| `VCENTER_SECRET_PATH` | Directory where `username` and `password` files are located to retrieve credentials | yes      | `"./"`           | `"/var/bindings/vsphere"`   |
+| Variable              | Description                                                                         | Required | Example                           | Default                   |
+|-----------------------|-------------------------------------------------------------------------------------|----------|-----------------------------------|---------------------------|
+| `VCENTER_URL`         | vCenter Server URL                                                                  | yes      | `https://myvc-01.prod.corp.local` | `""`                      |
+| `VCENTER_INSECURE`    | Ignore vCenter Server certificate warnings                                          | no       | `"true"`                          | `"false"`                 |
+| `VCENTER_SECRET_PATH` | Directory where `username` and `password` files are located to retrieve credentials | yes      | `"./"`                            | `"/var/bindings/vsphere"` |
 
 ### Use with Kubernetes
 
