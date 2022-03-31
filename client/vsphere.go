@@ -43,8 +43,8 @@ type Client struct {
 	Events *event.Manager
 }
 
-// vSphere settings
-type config struct {
+// Config configures the vsphere client via environment variables
+type Config struct {
 	Insecure   bool   `envconfig:"VCENTER_INSECURE" default:"false"`
 	Address    string `envconfig:"VCENTER_URL" required:"true"`
 	SecretPath string `envconfig:"VCENTER_SECRET_PATH" required:"true" default:"/var/bindings/vsphere"`
@@ -52,7 +52,7 @@ type config struct {
 
 // readKey reads the file from the secret path
 func readKey(key string) (string, error) {
-	var env config
+	var env Config
 	if err := envconfig.Process("", &env); err != nil {
 		return "", err
 	}
@@ -112,7 +112,7 @@ func (c *Client) Logout() error {
 //
 // Use Logout() to release resources and perform a clean logout from vCenter.
 func NewSOAP(ctx context.Context) (*govmomi.Client, error) {
-	var env config
+	var env Config
 	if err := envconfig.Process("", &env); err != nil {
 		return nil, err
 	}
@@ -180,7 +180,7 @@ func soapKeepAliveHandler(ctx context.Context, c *vim25.Client) func() error {
 //
 // Use Logout() to release resources and perform a clean logout from vCenter.
 func NewREST(ctx context.Context, vc *vim25.Client) (*rest.Client, error) {
-	var env config
+	var env Config
 	if err := envconfig.Process("", &env); err != nil {
 		return nil, err
 	}
