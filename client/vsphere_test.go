@@ -37,7 +37,8 @@ func TestNewClient(t *testing.T) {
 					"VCENTER_INSECURE":    "",
 					"VCENTER_SECRET_PATH": "",
 				},
-				wantErr: "certificate signed by unknown authority",
+				// different go versions throw different errors, this is a generic catch all
+				wantErr: "create vsphere SOAP client: Post",
 			},
 		}
 
