@@ -68,6 +68,9 @@ func readKey(key string) (string, error) {
 // keep-alive configured via environment variables. Commonly used managers are
 // exposed for quick access.
 //
+// A custom logger (zap.Logger) can be injected into the context via the logger
+// package.
+//
 // Use Logout() to release resources and perform a clean logout from vCenter.
 func New(ctx context.Context) (*Client, error) {
 	vclient, err := NewSOAP(ctx)
