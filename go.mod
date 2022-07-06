@@ -7,7 +7,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/vmware/govmomi v0.28.0
 	go.uber.org/zap v1.21.0
-	gotest.tools/v3 v3.0.3
+	gotest.tools/v3 v3.3.0
 	k8s.io/api v0.21.1
 	k8s.io/apimachinery v0.21.1
 	k8s.io/utils v0.0.0-20210527160623-6fdb442a123b
