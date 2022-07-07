@@ -1,3 +1,4 @@
+//go:build e2e
 // +build e2e
 
 package e2e
@@ -52,7 +53,7 @@ func TestWaitForClientJob(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// wait for the deployment to become ready
+			// wait for the vcsim deployment to become ready
 			err = wait.For(conditions.New(client.Resources()).ResourceMatch(depl, func(object k8s.Object) bool {
 				d := object.(*appsv1.Deployment)
 				return d.Status.AvailableReplicas == 1
@@ -66,20 +67,19 @@ func TestWaitForClientJob(t *testing.T) {
 
 			return ctx
 		}).
-		Assess("job completes", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
-			c := newClient(cfg.Namespace(), secret)
+		Assess("client job completes", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
+			clientJob := newClient(cfg.Namespace(), secret)
 
 			client, err := cfg.NewClient()
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			if err = client.Resources().Create(ctx, c); err != nil {
+			if err = client.Resources().Create(ctx, clientJob); err != nil {
 				t.Fatal(err)
 			}
 
-			// wait for the c to succeed
-			if err = wait.For(conditions.New(client.Resources()).JobCompleted(c), wait.WithTimeout(time.Minute*3)); err != nil {
+			if err = wait.For(conditions.New(client.Resources()).JobCompleted(clientJob), wait.WithTimeout(time.Minute*3)); err != nil {
 				t.Fatal(err)
 			}
 
@@ -118,7 +118,6 @@ func newSimulator(namespace string) (*appsv1.Deployment, *v1.Service) {
 						Name:  vcsim,
 						Image: "vmware/vcsim:latest",
 						Args: []string{
-							"/vcsim",
 							"-l",
 							":8989",
 						},
@@ -190,7 +189,7 @@ func newClient(namespace, secret string) *batchv1.Job {
 	}
 
 	k8senv := []v1.EnvVar{
-		{Name: "VCENTER_URL", Value: fmt.Sprintf("https://%s.%s.svc.cluster.local", vcsim, namespace)},
+		{Name: "VCENTER_URL", Value: fmt.Sprintf("https://%s.%s", vcsim, namespace)},
 		{Name: "VCENTER_INSECURE", Value: "true"},
 	}
 
