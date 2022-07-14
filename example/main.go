@@ -37,7 +37,9 @@ func main() {
 	if err != nil {
 		l.Fatal("could not create vsphere client", zap.Error(err))
 	}
-	defer c.Logout()
+	defer func() {
+		_ = c.Logout()
+	}()
 
 	// show how to use filters
 	filterEvents := []string{"UserLoginSessionEvent", "VmPoweredOnEvent", "DrsVmPoweredOnEvent"}
