@@ -31,7 +31,7 @@ jobs:
       id: go
 
     - name: Setup ko
-      uses: imjasonh/setup-ko@v0.4 # will install latest ko version
+      uses: imjasonh/setup-ko@v0.5 # will install latest ko version
 
     - name: Install tparse
       run: go install github.com/mfridman/tparse@latest
