@@ -7,7 +7,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/vmware/govmomi v0.29.0
-	go.uber.org/zap v1.22.0
+	go.uber.org/zap v1.23.0
 	gotest.tools/v3 v3.3.0
 	k8s.io/api v0.24.3
 	k8s.io/apimachinery v0.24.3
