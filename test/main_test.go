@@ -33,7 +33,7 @@ func TestMain(m *testing.M) {
 		envfuncs.CreateNamespace(namespace),
 	)
 	testenv.Finish(
-		envfuncs.DeleteNamespace(namespace),
+		// envfuncs.DeleteNamespace(namespace),
 		// envfuncs.DestroyKindCluster(e.KindCluster),
 	)
 	os.Exit(testenv.Run(m))

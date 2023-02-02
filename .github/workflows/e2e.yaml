@@ -15,7 +15,7 @@ jobs:
     name: Run E2E Tests
     strategy:
       matrix:
-        go-version: ["1.17"]
+        go-version: ["1.20"]
         platform: ["ubuntu-latest"]
     runs-on: ${{ matrix.platform }}
     env:
@@ -31,24 +31,27 @@ jobs:
       id: go
 
     - name: Setup ko
-      uses: imjasonh/setup-ko@v0.6 # will install latest ko version
+      uses: ko-build/setup-ko@v0.6
 
     - name: Install tparse
       run: go install github.com/mfridman/tparse@latest
 
-    - name: Check out Code onto GOPATH
+    - name: Check out Code
       uses: actions/checkout@v3
       with:
         fetch-depth: 1
-
+    
     - name: Setup KinD Cluster
       env:
-        KIND_VERSION: v0.11.1
+        KIND_VERSION: v0.17.0
       run: |
         set -x
         curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/kind-$(uname)-amd64
         chmod +x ./kind
         sudo mv kind /usr/local/bin
+
+        # E2E coverage folder
+        mkdir coverdata
 
         # KinD configuration.
         cat > kind.yaml <<EOF
@@ -57,12 +60,18 @@ jobs:
         nodes:
         - role: control-plane
         - role: worker
+          extraMounts:
+          - hostPath: $PWD/coverdata
+            containerPath: /coverdata
+            readOnly: false
         EOF
 
         # Create a cluster!
         kind create cluster --config kind.yaml --wait 3m --name ${KIND_CLUSTER_NAME}
 
-    - name: Build ko images
+    - name: Build ko images with coverage
+      env:
+        GOFLAGS: "-cover"
       run: ./test/upload_test_images.sh
 
     - name: "Run E2E Tests"
@@ -71,7 +80,28 @@ jobs:
       run: |
         go test ${TESTFLAGS} ./test | tparse -all -notests -format markdown >> $GITHUB_STEP_SUMMARY
 
+    - name: "Create coverage report"
+      run: |
+        cd coverdata
+        # print coverage to stdout
+        go tool covdata percent -i=.
+
+        # generate reports
+        go tool covdata textfmt -i=. -o profile.txt
+        go tool cover -html=profile.txt -o coverage.html
+
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v3
+      with:
+        name: code-coverage-report
+        path: coverdata
+
     - name: "Debug"
       if: ${{ always() }}
       run: |
+        # job logs
+        NS=$(kubectl get ns -o json | jq -r '.items[].metadata.name' | grep kind-ns)
+        kubectl -n $NS logs job/client
+
+        # pods list
         kubectl get pods --all-namespaces
