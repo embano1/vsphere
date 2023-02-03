@@ -178,7 +178,6 @@ func newVCSecret(namespace, name, username, password string) *v1.Secret {
 
 func newClient(namespace, secret string) *batchv1.Job {
 	var e envConfig
-
 	if err := envconfig.Process("", &e); err != nil {
 		panic("process environment variables: " + err.Error())
 	}
@@ -188,9 +187,12 @@ func newClient(namespace, secret string) *batchv1.Job {
 		"test": "e2e",
 	}
 
+	const coverDirPath = "/coverdata"
+
 	k8senv := []v1.EnvVar{
 		{Name: "VCENTER_URL", Value: fmt.Sprintf("https://%s.%s", vcsim, namespace)},
 		{Name: "VCENTER_INSECURE", Value: "true"},
+		{Name: "GOCOVERDIR", Value: coverDirPath},
 	}
 
 	client := batchv1.Job{
@@ -211,22 +213,42 @@ func newClient(namespace, secret string) *batchv1.Job {
 						Image:           fmt.Sprintf("%s/client", e.DockerRepo),
 						Env:             k8senv,
 						ImagePullPolicy: v1.PullIfNotPresent,
+						// TODO (@embano1): investigate why this is required in Github Actions to solve "permission
+						// denied" error writing to volume (w/ Docker on OSX this is not needed)
+						SecurityContext: &v1.SecurityContext{
+							RunAsUser: pointer.Int64(0),
+						},
 						VolumeMounts: []v1.VolumeMount{
 							{
 								Name:      "credentials",
 								ReadOnly:  true,
 								MountPath: mountPath,
 							},
-						},
-					}},
-					Volumes: []v1.Volume{{
-						Name: "credentials",
-						VolumeSource: v1.VolumeSource{
-							Secret: &v1.SecretVolumeSource{
-								SecretName: secret,
+							{
+								Name:      "coverdir",
+								ReadOnly:  false,
+								MountPath: coverDirPath,
 							},
 						},
 					}},
+					Volumes: []v1.Volume{
+						{
+							Name: "credentials",
+							VolumeSource: v1.VolumeSource{
+								Secret: &v1.SecretVolumeSource{
+									SecretName: secret,
+								},
+							},
+						},
+						{
+							Name: "coverdir",
+							VolumeSource: v1.VolumeSource{
+								HostPath: &v1.HostPathVolumeSource{
+									Path: coverDirPath,
+								},
+							},
+						},
+					},
 					RestartPolicy:                 v1.RestartPolicyOnFailure,
 					TerminationGracePeriodSeconds: pointer.Int64Ptr(5),
 				},
