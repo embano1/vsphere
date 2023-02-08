@@ -7,7 +7,8 @@ on:
     branches: ["main", "master"]
 
 concurrency:
-  group: e2e-${{ github.head_ref || github.run_id }}
+  # default: PR head ref, for other triggers workflow name
+  group: e2e-${{ github.head_ref || github.workflow }}
   cancel-in-progress: true
 
 jobs:
