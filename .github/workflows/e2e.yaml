@@ -25,6 +25,11 @@ jobs:
     timeout-minutes: 20
 
     steps:
+    - name: Check out Code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+        
     - name: Set up Go ${{ matrix.go-version }}
       uses: actions/setup-go@v3
       with:
@@ -37,11 +42,6 @@ jobs:
     - name: Install tparse
       run: go install github.com/mfridman/tparse@latest
 
-    - name: Check out Code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 1
-    
     - name: Setup KinD Cluster
       env:
         KIND_VERSION: v0.17.0
