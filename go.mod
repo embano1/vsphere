@@ -9,7 +9,7 @@ require (
 	github.com/vmware/govmomi v0.30.7
 	go.uber.org/zap v1.26.0
 	gotest.tools/v3 v3.5.1
-	k8s.io/api v0.28.1
+	k8s.io/api v0.28.2
 	k8s.io/apimachinery v0.28.2
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 	sigs.k8s.io/e2e-framework v0.3.0
