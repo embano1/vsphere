@@ -39,7 +39,7 @@ func ExampleNew() {
 		return nil
 	})
 
-	// 	Output: INFO connected to vcenter {"version": "7.0"}
+	// 	Output: INFO connected to vcenter {"version": "8.0.2.0"}
 }
 
 // this is only needed for the example. In a real deployment, e.g. Kubernetes
