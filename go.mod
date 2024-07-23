@@ -6,7 +6,7 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/vmware/govmomi v0.37.3
+	github.com/vmware/govmomi v0.39.0
 	go.uber.org/zap v1.26.0
 	gotest.tools/v3 v3.5.1
 	k8s.io/api v0.28.4
@@ -46,7 +46,7 @@ require (
 	golang.org/x/oauth2 v0.8.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/term v0.18.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
